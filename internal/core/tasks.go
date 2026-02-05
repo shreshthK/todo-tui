@@ -63,6 +63,11 @@ func DeleteTask(tasks []Task, id int) ([]Task, error) {
 		return nil, errors.New("DeleteTask: task not found")
 	}
 
+	// Reassign IDs so they are contiguous after deletion.
+	for i := range updated {
+		updated[i].ID = i + 1
+	}
+
 	return updated, nil
 }
 
