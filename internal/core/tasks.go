@@ -84,6 +84,19 @@ func MarkDone(tasks []Task, id int) ([]Task, error) {
 	return nil, errors.New("MarkDone: task not found")
 }
 
+// ToggleDone flips a task's completion state by ID and returns the updated slice.
+func ToggleDone(tasks []Task, id int) ([]Task, error) {
+	// Flip the Done flag on the matching task.
+	for i, t := range tasks {
+		if t.ID == id {
+			tasks[i].Done = !tasks[i].Done
+			return tasks, nil
+		}
+	}
+
+	return nil, errors.New("ToggleDone: task not found")
+}
+
 // ListTasks returns tasks filtered by the provided filter string.
 func ListTasks(tasks []Task, filter string) ([]Task, error) {
 	// Normalize the filter so we can accept variants like "Done" or "DONE".

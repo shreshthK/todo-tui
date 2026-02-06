@@ -9,16 +9,13 @@ import (
 
 	"github.com/shreshthkandari/todo-tui/internal/core"
 	"github.com/shreshthkandari/todo-tui/internal/store"
+	"github.com/shreshthkandari/todo-tui/internal/ui"
 )
 
 // main is the CLI entry point; it parses args, loads tasks, and dispatches commands.
 func main() {
 	// Parse the command-line arguments (excluding the program name).
 	args := os.Args[1:]
-	if len(args) == 0 {
-		printUsage()
-		return
-	}
 
 	// Decide where the tasks JSON file should live on this machine.
 	storePath, err := defaultStorePath()
@@ -38,7 +35,20 @@ func main() {
 	}
 
 	// Dispatch to the right command implementation.
+	if len(args) == 0 {
+		if err := ui.StartTUI(taskStore, tasks); err != nil {
+			fmt.Printf("error: could not start tui: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	switch args[0] {
+	case "tui":
+		if err := ui.StartTUI(taskStore, tasks); err != nil {
+			fmt.Printf("error: could not start tui: %v\n", err)
+			os.Exit(1)
+		}
 	case "add":
 		handleAdd(taskStore, tasks, args[1:])
 	case "list":
@@ -201,9 +211,11 @@ func printTasks(tasks []core.Task) {
 
 // printUsage explains the available commands and examples.
 func printUsage() {
-	fmt.Println("todo-tui (CLI mode)")
+	fmt.Println("todo-tui (TUI + CLI)")
 	fmt.Println("")
 	fmt.Println("Usage:")
+	fmt.Println("  todo-tui                  # start TUI")
+	fmt.Println("  todo-tui tui              # start TUI")
 	fmt.Println("  todo-tui add \"task title\"")
 	fmt.Println("  todo-tui list [all|done|todo]")
 	fmt.Println("  todo-tui done <id>")
